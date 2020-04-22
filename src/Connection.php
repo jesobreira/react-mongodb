@@ -15,28 +15,19 @@ use UnexpectedValueException;
 
 class Connection extends EventEmitter
 {
-    /** @var bool */
     private $ending;
-    /** @var ResponseParser  */
     private $responseParser;
-    /** @var int */
     private $requestId;
-    /** @var SplQueue  */
     private $requestQueue;
-    /** @var Stream  */
     private $stream;
 
-    /**
-     * Connection constructor.
-     * @param Stream $stream
-     */
     public function __construct(Stream $stream)
     {
         $this->requestQueue = new SplQueue();
         $this->responseParser = new ResponseParser();
         $this->stream = $stream;
 
-        $stream->on('data', function($data) {
+        $stream->on('data', function ($data) {
             try {
                 $replies = $this->responseParser->pushAndGetParsed($data);
 
@@ -50,12 +41,12 @@ class Connection extends EventEmitter
             }
         });
 
-        $stream->on('close', function() {
+        $stream->on('close', function () {
             $this->close();
             $this->emit('close');
         });
 
-        $stream->on('error', function(Exception $e, Stream $stream) {
+        $stream->on('error', function (Exception $e, Stream $stream) {
             $this->emit('error', [$e, $stream]);
             $this->close();
         });
@@ -68,7 +59,7 @@ class Connection extends EventEmitter
         $this->stream->close();
 
         // reject all remaining requests in the queue
-        while ( ! $this->requestQueue->isEmpty()) {
+        while (! $this->requestQueue->isEmpty()) {
             $request = $this->requestQueue->dequeue();
             $request->reject(new RuntimeException('Connection closed'));
         }
@@ -83,9 +74,6 @@ class Connection extends EventEmitter
         }
     }
 
-    /**
-     * @param Reply $reply
-     */
     public function handleReply(Reply $reply)
     {
         $this->emit('message', [$reply, $this]);
@@ -96,7 +84,7 @@ class Connection extends EventEmitter
 
         $request = $this->requestQueue->dequeue();
 
-        if ( ! $reply->isResponseTo($request->getRequestId())) {
+        if (! $reply->isResponseTo($request->getRequestId())) {
             throw new UnexpectedValueException(sprintf('Request ID (%d) does not match reply (%d)', $request->getRequestId(), $reply->getResponseTo()));
         }
 
@@ -107,10 +95,6 @@ class Connection extends EventEmitter
         }
     }
 
-    /**
-     * @param RequestInterface $requestMessage
-     * @return \React\Promise\PromiseInterface
-     */
     public function send(RequestInterface $requestMessage)
     {
         if ($this->ending) {
