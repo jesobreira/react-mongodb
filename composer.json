@@ -1,5 +1,5 @@
 {
-    "name": "jmikola/react-mongodb",
+    "name": "jesobreira/react-mongodb",
     "description": "Asynchronous MongoDB client for React PHP.",
     "keywords": [ "async", "client", "mongodb", "react" ],
     "license": "MIT",
@@ -13,7 +13,7 @@
         "react/stream": "0.4.*"
     },
     "autoload": {
-        "psr-4": { "Jmikola\\React\\MongoDB\\": "src/" }
+        "psr-4": { "Jesobreira\\React\\MongoDB\\": "src/" }
     },
     "extra": {
         "branch-alias": {
